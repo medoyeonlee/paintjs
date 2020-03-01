@@ -1,6 +1,18 @@
 const canvas = document.getElementById('jsCanvas');
-const painting = false;
+let painting = false;
+const ctx = canvas.getContext('2d');
+const colors = document.getElementsByClassName('jsColor');
 
+//letting know canvas's size
+canvas.width=700;
+canvas.height=700;
+
+ctx.stokeStyle='#2c2c2c'; //drawing lines have this color
+ctx.lineWidth=2.5; // same above. but line
+
+function startPainting(){
+    painting=true;
+}
 function stopPainting(){
     painting=false;
 }
@@ -8,21 +20,45 @@ function onMouseMove(event){
     const x = event.offsetX;
     const y= event.offsetY;
     
+    if(!painting){
+        ctx.beginPath();  //path is a line. where the mouse cursor located.
+        ctx.moveTo(x,y);
+    } else{
+        ctx.lineTo(x,y); //start drawing path to line
+        ctx.stroke();
+    }
 }
 
-function onMouseDown(event){
-    painting=true;
+
+const rgbToHex = function(rgb){
+    let hex = Number(rgb).toString(16);
+    if(hex.length<2){
+        hex="0"+hex;
+    }
+    return hex;
 }
+const fullColorHex = function(r,g,b){
+    const red = rgbToHex(r);
+    const green = rgbToHex(g);
+    const blue = rgbToHex(b);
+    return '#'+red+green+blue;
 
-function onMOuseUp(event){
-   stopPainting();
 }
-
-
+function handleColorClick(event){
+    const color = event.target.style.backgroundColor;
+  
+    console.log(color)
+    ctx.strokeStyle=color;
+    console.log(ctx.strokeStyle)
+}
 
 if(canvas){
     canvas.addEventListener('mousemove',onMouseMove)
-    canvas.addEventListener('mousedown',onMouseDown)
-    canvas.addEventListener('mouseup',onMouseUp);
+    canvas.addEventListener('mousedown',startPainting)
+    canvas.addEventListener('mouseup',stopPainting);
     canvas.addEventListener('mouseleave',stopPainting);
 }
+console.log(ctx.stokeStyle)
+Array.from(colors).forEach(color => 
+    color.addEventListener('click',handleColorClick)
+)
